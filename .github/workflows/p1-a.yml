@@ -1,0 +1,38 @@
+name: P1 A Render
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'experiments/p1-a/**'
+      - '.github/workflows/p1-a.yml'
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: experiments/p1-a
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Check composition
+        run: npm run compositions
+      - name: Render
+        run: npm run render
+      - name: Verify MP4
+        run: |
+          test -s out/particle-path.mp4
+          ffprobe -v error -show_entries format=duration -show_entries stream=width,height,avg_frame_rate -of json out/particle-path.mp4
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: p1-a-remotion-mp4
+          path: experiments/p1-a/out/particle-path.mp4
+          if-no-files-found: error
