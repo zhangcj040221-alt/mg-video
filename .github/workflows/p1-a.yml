@@ -26,15 +26,25 @@ jobs:
         run: timeout 2m npm run compositions
       - name: Render
         run: timeout 10m npm run render
-      - name: Install ffprobe
+      - name: Reuse Remotion bundled ffprobe
+        timeout-minutes: 2
         run: |
-          if command -v ffprobe >/dev/null 2>&1; then
-            echo 'ffprobe already available; skipping installation'
-          else
-            timeout 90s sudo apt-get -o Acquire::Retries=0 update -qq
-            timeout 90s sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=0 install -y -qq ffmpeg
-          fi
-          command -v ffprobe
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/remotion-bin"
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const pkg = '@remotion/compositor-linux-x64-gnu';
+          const root = path.dirname(require.resolve(pkg + '/package.json'));
+          const found = fs.readdirSync(root, {recursive: true}).find(x => path.basename(x) === 'ffprobe');
+          if (!found) throw new Error('Bundled ffprobe not found in ' + root);
+          const target = path.join(process.env.RUNNER_TEMP, 'remotion-bin', 'ffprobe');
+          fs.copyFileSync(path.join(root, found), target);
+          fs.chmodSync(target, 0o755);
+          fs.appendFileSync(process.env.GITHUB_PATH, path.dirname(target) + '\n');
+          fs.appendFileSync(process.env.GITHUB_ENV, 'LD_LIBRARY_PATH=' + root + ':' + (process.env.LD_LIBRARY_PATH || '') + '\n');
+          NODE
+          LD_LIBRARY_PATH="$(node -p "require('path').dirname(require.resolve('@remotion/compositor-linux-x64-gnu/package.json'))"):${LD_LIBRARY_PATH:-}" "$RUNNER_TEMP/remotion-bin/ffprobe" -version | head -1
       - name: Verify MP4
         run: |
           python3 - <<'PY'
