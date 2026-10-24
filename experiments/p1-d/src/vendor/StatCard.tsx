@@ -50,7 +50,7 @@ export const StatCard: React.FC<StatCardProps> = ({
             transform: `scale(${scale})`,
             fontSize: statFontSize,
             color: accentColor,
-            fontFamily: "Inter, system-ui, sans-serif",
+            fontFamily: "'Noto Sans SC', sans-serif",
             fontWeight: 800,
             lineHeight: 1.1,
           }}
