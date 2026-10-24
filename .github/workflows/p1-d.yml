@@ -65,9 +65,9 @@ jobs:
           assert (s['width'],s['height']) == (1920,1080), 'Unexpected dimensions'
           assert s['avg_frame_rate'] == '30/1', 'Unexpected framerate'
           duration = float(s['duration'])
-          assert abs(duration-6.0)<0.04, 'Unexpected duration'
-          frames = int(s.get('nb_frames','180'))
-          assert frames==180, 'Unexpected frame count'
+          assert abs(duration-10.0)<0.04, 'Unexpected duration'
+          frames = int(s.get('nb_frames','300'))
+          assert frames==300, 'Unexpected frame count'
           PY
       - name: Upload result
         if: always()
