@@ -3,7 +3,7 @@ import {AbsoluteFill,useCurrentFrame} from 'remotion';
 const clamp=(n:number)=>Math.max(0,Math.min(1,n));
 const ease=(n:number)=>{const t=clamp(n);return t*t*(3-2*t);};
 const mix=(a:number,b:number,t:number)=>a+(b-a)*t;
-const FONT='Noto Sans CJK SC, Noto Sans CJK JP, sans-serif';
+const FONT='Noto Sans SC, sans-serif';
 const parts=[
  {name:'CPU · 中央处理器',detail:'负责执行计算指令',x:0,y:-128,dx:-360,dy:-190,w:154,h:134,color:'#8ce5ff',type:'cpu'},
  {name:'RAM · 内存',detail:'暂存正在使用的数据',x:155,y:-90,dx:370,dy:-180,w:90,h:235,color:'#a6f3c3',type:'ram'},
@@ -22,17 +22,17 @@ export const ComputerExploded:React.FC=()=>{
  <g transform="translate(960 530)">
  <rect x="-300" y="-280" width="600" height="560" rx="28" fill="#101f31" stroke="#47647c" strokeWidth="5"/>
  <rect x="-270" y="-248" width="540" height="496" rx="14" fill="#152b3e" stroke="#36556a" strokeWidth="2"/>
- {Array.from({length:7},(_,i)=><path key={i} d={`M -245 ${-180+i*58} H 245`} stroke="#28506a" strokeWidth="2" opacity=".55"/>)}
+ {Array.from({length:12},(_,i)=><g key={i}><path d={`M -245 ${-210+i*37} H 245`} stroke="#4e9485" strokeWidth="2" opacity=".65"/><circle cx={-210+(i%3)*195} cy={-210+i*37} r="5" fill="#d9b36b"/></g>)}
  {parts.map((p,i)=>{
  const x=mix(p.x,p.x+p.dx,amount),y=mix(p.y,p.y+p.dy,amount);
  return <g key={p.type}>
  <g transform={`translate(${x} ${y})`}>
  <rect x={-p.w/2} y={-p.h/2} width={p.w} height={p.h} rx="12" fill="#20374a" stroke={p.color} strokeWidth="5"/>
  <rect x={-p.w/2+13} y={-p.h/2+13} width={p.w-26} height={p.h-26} rx="6" fill={p.color} fillOpacity=".18" stroke={p.color} strokeOpacity=".5"/>
- {p.type==='cpu'&&<text textAnchor="middle" y="12" fill={p.color} fontSize="37" fontFamily={FONT} fontWeight="700">CPU</text>}
- {p.type==='ram'&&Array.from({length:5},(_,j)=><rect key={j} x="-27" y={-92+j*37} width="54" height="22" rx="4" fill={p.color} fillOpacity=".7"/>)}
+ {p.type==='cpu'&&<><rect x="-48" y="-43" width="96" height="86" rx="6" fill="#527282" stroke="#d5e6e9" strokeWidth="4"/><text textAnchor="middle" y="10" fill="#ffffff" fontSize="29" fontFamily={FONT} fontWeight="700">CPU</text></>}
+ {p.type==='ram'&&Array.from({length:5},(_,j)=><rect key={j} x="-27" y={-92+j*37} width="54" height="22" rx="3" fill="#143b2f" stroke={p.color} strokeWidth="3"/>)}
  {p.type==='ssd'&&<text textAnchor="middle" y="12" fill={p.color} fontSize="35" fontFamily={FONT}>SSD</text>}
- {p.type==='gpu'&&<><circle cx="-50" cy="0" r="36" fill="none" stroke={p.color} strokeWidth="9"/><circle cx="52" cy="0" r="36" fill="none" stroke={p.color} strokeWidth="9"/></>}
+ {p.type==='gpu'&&<>{[-50,52].map(cx=><g key={cx}><circle cx={cx} cy="0" r="39" fill="#0e1d2e" stroke={p.color} strokeWidth="5"/>{Array.from({length:6},(_,j)=><path key={j} d={`M ${cx} 0 l 7 -31 q 25 9 5 31 z`} transform={`rotate(${j*60} ${cx} 0)`} fill="#9f86c8"/>)}<circle cx={cx} cy="0" r="8" fill="#e6ddf7"/></g>)}</>}
  </g>
  {amount>.01&&<g opacity={ease(amount*2)}>
  <path d={p.dx<0?`M ${x-p.w/2-10} ${y} L -470 ${p.dy<0?-170:198} L -490 ${p.dy<0?-170:198}`:`M ${x+p.w/2+10} ${y} L 490 ${p.dy<0?-170:198} L 510 ${p.dy<0?-170:198}`} fill="none" stroke={p.color} strokeWidth="2" strokeOpacity=".7"/>
