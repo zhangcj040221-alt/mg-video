@@ -1,0 +1,17 @@
+{
+  "name": "mg-video-p1-b4",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "remotion render src/index.ts ComputerB4 out/computer-b4.mp4 --codec h264 --crf 18",
+    "compositions": "remotion compositions src/index.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.367",
+    "remotion": "4.0.367",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "@fontsource/noto-sans-sc": "5.2.7"
+  }
+}
