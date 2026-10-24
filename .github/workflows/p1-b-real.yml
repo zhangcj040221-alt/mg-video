@@ -20,6 +20,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install Chinese font and verify glyph coverage
+        timeout-minutes: 4
+        run: |
+          set -euo pipefail
+          timeout 150s sudo apt-get update -qq
+          timeout 70s sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          fc-match 'Noto Sans CJK SC:lang=zh-cn'
+          fc-list :lang=zh-cn family | grep -i 'Noto Sans CJK' | head -3
       - name: Install dependencies
         run: timeout 5m npm install --no-audit --no-fund
       - name: Check composition
