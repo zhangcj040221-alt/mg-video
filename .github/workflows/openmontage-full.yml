@@ -1,0 +1,63 @@
+name: OpenMontage Full Integration
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'experiments/openmontage-full/**'
+      - '.github/workflows/openmontage-full.yml'
+permissions:
+  contents: read
+jobs:
+  install_and_audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout MG project
+        uses: actions/checkout@v4
+      - name: Checkout entire upstream OpenMontage
+        uses: actions/checkout@v4
+        with:
+          repository: fivetaku/openmontage
+          ref: main
+          path: experiments/openmontage-full/upstream
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install full core Python environment
+        working-directory: experiments/openmontage-full/upstream
+        run: timeout 5m python -m pip install -r requirements.txt
+      - name: Install upstream Remotion composer
+        working-directory: experiments/openmontage-full/upstream/remotion-composer
+        run: timeout 8m npm ci --no-audit --no-fund
+      - name: Audit full upstream pipelines and agent tools
+        working-directory: experiments/openmontage-full/upstream
+        run: |
+          mkdir -p ../reports
+          python - <<'PY'
+          import json, pathlib
+          root=pathlib.Path('.')
+          result={'pipelines':[str(p) for p in sorted((root/'pipeline_defs').rglob('*')) if p.is_file()],
+                  'skills':len(list((root/'skills').rglob('*'))),
+                  'tools':len(list((root/'tools').rglob('*.py'))),
+                  'composer_components':[p.name for p in sorted((root/'remotion-composer/src/components').rglob('*.tsx'))],
+                  'source':'fivetaku/openmontage','license':'AGPL-3.0'}
+          pathlib.Path('../reports/inventory.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+          print(json.dumps({'pipelines':len(result['pipelines']),'skills_entries':result['skills'],'python_tools':result['tools'],'components':len(result['composer_components'])},indent=2))
+          PY
+      - name: Verify upstream Remotion compositions
+        working-directory: experiments/openmontage-full/upstream/remotion-composer
+        run: timeout 4m npx remotion compositions src/index.tsx
+      - name: Upload complete integration audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openmontage-full-integration-audit
+          path: experiments/openmontage-full/reports/
+          if-no-files-found: warn
