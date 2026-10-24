@@ -1,13 +1,13 @@
 import React from 'react';
 import {AbsoluteFill,useCurrentFrame} from 'remotion';
-import {Cpu,MemoryStick,HardDrive,Gpu,Monitor,ArrowUpRight} from 'lucide-react';
+import {Cpu,MemoryStick,HardDrive,CircuitBoard,ArrowUpRight} from 'lucide-react';
 const FONT="'Noto Sans SC',sans-serif";
 const smooth=(x:number)=>{const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t)};
 const ITEMS=[
  {key:'CPU',title:'中央处理器',desc:'执行计算与控制指令',color:'#70d8ff',Icon:Cpu},
  {key:'RAM',title:'运行内存',desc:'暂存正在使用的数据',color:'#83ebbb',Icon:MemoryStick},
  {key:'SSD',title:'固态硬盘',desc:'长期保存文件与系统',color:'#ffce8b',Icon:HardDrive},
- {key:'GPU',title:'图形处理器',desc:'负责图形与并行计算',color:'#c6a9ff',Icon:Gpu},
+ {key:'GPU',title:'图形处理器',desc:'负责图形与并行计算',color:'#c6a9ff',Icon:CircuitBoard},
 ];
 export const ComputerB5:React.FC=()=>{
  const frame=useCurrentFrame(),t=frame/30;
